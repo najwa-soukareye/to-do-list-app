@@ -187,5 +187,78 @@
     
         <ul id="task-list"></ul>
       </div>
+
+      <script>
+        let tasks = [];
+    
+        function renderTasks(filter = "all") {
+          const taskList = document.getElementById("task-list");
+          taskList.innerHTML = "";
+    
+          const filtered = tasks.filter(task =>
+            filter === "all" ||
+            (filter === "completed" && task.completed) ||
+            (filter === "pending" && !task.completed)
+          );
+    
+          filtered.forEach((task, index) => {
+            const li = document.createElement("li");
+            li.className = task.completed ? "completed" : "";
+    
+            const span = document.createElement("span");
+            span.textContent = task.text;
+    
+            const btnContainer = document.createElement("div");
+            btnContainer.className = "task-buttons";
+    
+            const completeBtn = document.createElement("button");
+            completeBtn.innerHTML = task.completed ? "✅" : "○";
+            completeBtn.className = "task-btn complete-btn";
+            completeBtn.onclick = () => toggleComplete(index);
+    
+            const removeBtn = document.createElement("button");
+            removeBtn.innerHTML = "🗑️";
+            removeBtn.className = "task-btn remove-btn";
+            removeBtn.onclick = () => deleteTask(index);
+    
+            btnContainer.appendChild(completeBtn);
+            btnContainer.appendChild(removeBtn);
+    
+            li.appendChild(span);
+            li.appendChild(btnContainer);
+            taskList.appendChild(li);
+          });
+        }
+    
+        function addTask() {
+          const input = document.getElementById("task-input");
+          const text = input.value.trim();
+          if (text) {
+            tasks.push({ text, completed: false });
+            input.value = "";
+            renderTasks(document.querySelector(".filter.active").dataset.filter);
+          }
+        }
+    
+        function toggleComplete(index) {
+          tasks[index].completed = !tasks[index].completed;
+          renderTasks(document.querySelector(".filter.active").dataset.filter);
+        }
+    
+        function deleteTask(index) {
+          tasks.splice(index, 1);
+          renderTasks(document.querySelector(".filter.active").dataset.filter);
+        }
+    
+        document.querySelectorAll(".filter").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderTasks(btn.dataset.filter);
+          });
+        });
+    
+        renderTasks(); 
+      </script>
 </body>
 </html>
